@@ -1,5 +1,5 @@
 <template>
-    <v-layer>
+    <v-layout>
         <router-link
             class="logo-link"
             title="Home page"
@@ -10,7 +10,7 @@
                 src="../../assets/tractor.png"
             />
         </router-link>
-    </v-layer>
+    </v-layout>
 </template>
 
 <script>

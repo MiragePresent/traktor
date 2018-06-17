@@ -16,7 +16,7 @@
 </template>
 <script>
 import Logo from './components/common/Logo'
-import AuthBar from './components/auth/AuthBar'
+import AuthBar from './components/Auth/AuthBar'
 export default {
   components: {
     Logo,

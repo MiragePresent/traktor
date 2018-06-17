@@ -1,8 +1,13 @@
 <template>
-    <v-layer class="auth-links">
-        <a class="title" href="#">Sign in</a> or
-        <a class="title" href="#">Sing up</a>
-    </v-layer>
+    <v-layout class="auth-links">
+        <router-link
+            class="title"
+            title="Sing in"
+            :to="{name: 'login'}"
+        >
+            Sing in
+        </router-link>
+    </v-layout>
 </template>
 
 <script>
