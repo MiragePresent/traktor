@@ -1,13 +1,29 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+    <v-app>
+        <v-toolbar app>
+            <v-container>
+                <logo class="left"/>
+                <auth-bar class="right"/>
+            </v-container>
+        </v-toolbar>
+        <v-content>
+            <v-container fluid>
+                <router-view></router-view>
+            </v-container>
+        </v-content>
+        <v-footer app></v-footer>
+  </v-app>
 </template>
-
+<script>
+import Logo from './components/common/Logo'
+import AuthBar from './components/auth/AuthBar'
+export default {
+  components: {
+    Logo,
+    AuthBar
+  }
+}
+</script>
 <style>
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;

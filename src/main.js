@@ -11,6 +11,10 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import VueApollo from 'vue-apollo'
 import { VUE_APP_API_QL } from './config.js'
 
+// Vuetify
+import Vuetify from 'vuetify'
+import 'vuetify/dist/vuetify.min.css'
+
 const httpLink = new HttpLink({
   uri: VUE_APP_API_QL
 })
@@ -27,6 +31,7 @@ const apolloProvider = new VueApollo({
 })
 
 Vue.use(VueApollo)
+Vue.use(Vuetify)
 
 Vue.config.productionTip = false
 
