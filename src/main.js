@@ -1,34 +1,12 @@
 import Vue from 'vue'
+import VueApollo from 'vue-apollo'
+import Vuetify from 'vuetify'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import { apolloProvider } from './bootstrap'
 import './registerServiceWorker'
-
-// Vue Apollo
-import { ApolloClient } from 'apollo-client'
-import { HttpLink } from 'apollo-link-http'
-import { InMemoryCache } from 'apollo-cache-inmemory'
-import VueApollo from 'vue-apollo'
-import { VUE_APP_API_QL } from './config.js'
-
-// Vuetify
-import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
-
-const httpLink = new HttpLink({
-  uri: VUE_APP_API_QL
-})
-
-// Create the apollo client
-const apolloClient = new ApolloClient({
-  link: httpLink,
-  cache: new InMemoryCache(),
-  connectToDevTools: true
-})
-
-const apolloProvider = new VueApollo({
-  defaultClient: apolloClient
-})
 
 Vue.use(VueApollo)
 Vue.use(Vuetify)
