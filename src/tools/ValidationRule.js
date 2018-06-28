@@ -19,16 +19,15 @@ export default class ValidationRule {
   _getHandler (rule) {
     console.log('getting rule :', rule)
     if (typeof rule === 'string') {
-      //     // console.log(rule, this.name, validators[this.name]);
-      console.log('error: ', rule)
-      return validators[rule]
+      // console.log(rule, this.name, validators[this.name]);
+      return validators[this.name]
     } else if (typeof rule === 'object') {
-      //     let args = Object.values(rule)[0];
-      //     if (typeof args === 'object') {
-      //         return validators[this.name](...args);
-      //     } else {
-      //         return validators[this.name](args);
-      // }
+      let args = Object.values(rule)[0]
+      if (typeof args === 'object') {
+        return validators[this.name](...args)
+      } else {
+        return validators[this.name](args)
+      }
     }
     return this.__notValid()
   }
