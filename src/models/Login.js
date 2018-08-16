@@ -1,20 +1,17 @@
 import BaseModel from './BaseModel'
 
-export default class Register extends BaseModel {
+export default class Login extends BaseModel {
   fields () {
     return Object.assign(super.fields(), {
-      name: '',
       email: '',
-      phone: '',
-      password: ''
+      password: '',
+      code: ''
     })
   }
 
   rules () {
     return {
-      name: ['required'],
       email: ['required'],
-      phone: ['required'],
       password: ['required']
     }
   }

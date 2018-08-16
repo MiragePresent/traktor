@@ -1,28 +1,14 @@
 <template>
-    <form @submit.prevent="singUp">
+    <form @submit.prevent="send">
         <v-card>
             <v-card-title class="title">{{ title }}</v-card-title>
             <v-container>
-                <v-text-field
-                        v-model="model.name"
-                        label="Enter your name"
-                        :error-messages="nameErrors"
-                        @input="$v.model.name.$touch()"
-                        @blur="$v.model.name.$touch()"
-                />
                 <v-text-field
                         v-model="model.email"
                         label="Enter your E-Mail"
                         :error-messages="emailErrors"
                         @input="$v.model.email.$touch()"
                         @blur="$v.model.email.$touch()"
-                />
-                <v-text-field
-                        v-model="model.phone"
-                        label="Enter your phone number"
-                        :error-messages="phoneErrors"
-                        @input="$v.model.phone.$touch()"
-                        @blur="$v.model.phone.$touch()"
                 />
                 <v-text-field
                         v-model="model.password"
@@ -32,6 +18,13 @@
                         @input="$v.model.password.$touch()"
                         @blur="$v.model.password.$touch()"
                 />
+                <v-text-field
+                        v-if="confirmation"
+                        v-model="model.code"
+                        label="Confirm code"
+                        type="password"
+
+                />
             </v-container>
             <v-card-actions>
                 <v-btn
@@ -39,8 +32,10 @@
                         class="blue right"
                         type="submit"
                 >
-                    Sing Up
+                    {{ confirmation ? 'Confirm' : 'Sing In' }}
                 </v-btn>
+                <v-spacer></v-spacer>
+                <router-link :to="{name: 'forgot', params: {user_email: 'm' }}">Forgot your password?</router-link>
             </v-card-actions>
         </v-card>
     </form>
@@ -48,42 +43,60 @@
 
 <script>
 import {validationMixin} from 'vuelidate'
-import Register from '../../models/Register'
+import Login from '../../models/Login'
 import Auth from '../../tools/Auth'
 
 export default {
   data () {
     return {
-      model: new Register()
+      confirmation: false,
+      model: new Login()
     }
   },
   methods: {
-    singUp (event) {
+    send () {
+      if (this.confirmation) {
+        this.confirm()
+      } else {
+        this.singIn()
+      }
+    },
+    singIn () {
       if (!this.$v.$anyError) {
-        Auth.register(
+        Auth.authenticate(
+          this.model.getData(),
+          (user) => {
+            alert('You are logged in')
+            this.$router.push({name: 'home'})
+          },
+          (error, data) => {
+            if (error.code === Auth.USER_NOT_CONFIRMED) {
+              alert('Your account is not confirmed. Please enter confirmation code')
+              this.confirmation = true
+            }
+          }
+        )
+      }
+    },
+    confirm () {
+      if (!this.$v.$anyError) {
+        console.log('singing in...')
+        Auth.confirm(
           this.model.getData(),
           (error, result) => {
             if (error) {
               return
             }
-
-            alert('You are successfully registered')
-            this.model.clear()
-            this.$v.$reset()
-            this.$router.push({name: 'login'})
-          })
+            this.confirmation = false
+            this.singIn()
+          }
+        )
       }
     }
   },
   computed: {
-    nameErrors () {
-      return this.model.getErrors(this.$v, 'name')
-    },
     emailErrors () {
       return this.model.getErrors(this.$v, 'email')
-    },
-    phoneErrors () {
-      return this.model.getErrors(this.$v, 'phone')
     },
     passwordErrors () {
       return this.model.getErrors(this.$v, 'password')

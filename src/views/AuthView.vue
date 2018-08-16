@@ -11,6 +11,9 @@
 
 <script>
 import AuthRegister from '../components/Auth/AuthRegister'
+import AuthLogin from '../components/Auth/AuthLogin'
+import AuthForgot from '../components/Auth/AuthForgotPassword'
+
 import { strToTitleCase } from '../tools/helpers'
 export default {
   computed: {
@@ -23,7 +26,9 @@ export default {
     }
   },
   components: {
-    AuthRegister
+    AuthRegister,
+    AuthLogin,
+    AuthForgot
   }
 }
 </script>

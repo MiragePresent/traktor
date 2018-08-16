@@ -21,6 +21,10 @@ export default new Router({
       name: 'register',
       component: AuthView
     }, {
+      path: '/forgot/:user_email',
+      name: 'forgot',
+      component: AuthView
+    }, {
       path: '/about',
       name: 'about',
       component: About
