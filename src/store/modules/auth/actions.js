@@ -2,10 +2,14 @@ import {
   SET_USERNAME,
   SET_NAME,
   SET_EMAIL,
+  SET_STATUS,
   INVALIDATE_DATA
 } from './types'
 
 export default {
+  setStatus ({ commit }, status) {
+    commit(SET_STATUS, status)
+  },
   setUsername ({ commit }, user) {
     commit(SET_USERNAME, user)
   },

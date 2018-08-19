@@ -1,3 +1,4 @@
+export const SET_STATUS = 'SET_STATUS'
 export const SET_USERNAME = 'SET_USERNAME'
 export const SET_NAME = 'SET_NAME'
 export const SET_EMAIL = 'SET_EMAIL'

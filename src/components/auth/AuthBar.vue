@@ -1,5 +1,5 @@
 <template>
-    <v-layout class="auth-links" v-if="!token">
+    <v-layout class="auth-links" v-if="!status">
         <router-link
                 class="title"
                 title="Sing in"
@@ -34,11 +34,10 @@ import Auth from '../../tools/Auth'
 
 export default {
   computed: {
-    ...mapGetters('auth', ['name', 'token'])
+    ...mapGetters('auth', ['name', 'status'])
   },
   methods: {
     logout: () => {
-      console.log('here')
       Auth.logout()
     }
   }

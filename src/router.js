@@ -6,7 +6,7 @@ import AuthView from './views/AuthView.vue'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -15,15 +15,24 @@ export default new Router({
     }, {
       path: '/login',
       name: 'login',
-      component: AuthView
+      component: AuthView,
+      meta: {
+        middleware: ['guest']
+      }
     }, {
       path: '/register',
       name: 'register',
-      component: AuthView
+      component: AuthView,
+      meta: {
+        middleware: ['guest']
+      }
     }, {
       path: '/forgot/:user_email',
       name: 'forgot',
-      component: AuthView
+      component: AuthView,
+      meta: {
+        middleware: ['guest']
+      }
     }, {
       path: '/about',
       name: 'about',
@@ -31,3 +40,5 @@ export default new Router({
     }
   ]
 })
+
+export default router

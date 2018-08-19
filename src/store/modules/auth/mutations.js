@@ -2,10 +2,14 @@ import {
   SET_USERNAME,
   SET_NAME,
   SET_EMAIL,
+  SET_STATUS,
   INVALIDATE_DATA
 } from './types'
 
 export default {
+  [SET_STATUS] (state, status) {
+    state.status = status
+  },
   [SET_USERNAME] (state, username) {
     state.username = username
   },
@@ -16,6 +20,7 @@ export default {
     state.email = email
   },
   [INVALIDATE_DATA] (state) {
+    state.status = false
     state.username = null
     state.name = null
     state.email = null
