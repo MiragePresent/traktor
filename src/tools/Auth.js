@@ -5,28 +5,19 @@ import {
   AuthenticationDetails,
   CognitoUser
 } from 'amazon-cognito-identity-js'
-import {
-  COGNITO_USER_POOL_ID,
-  COGNITO_APP_CLIENT_ID
-} from '../config.js'
+import { aws as awsConfig } from '../config.js'
 
 export default {
   // Configs
   USER_NOT_CONFIRMED: 'UserNotConfirmedException',
-  NAME_FIELD: 'name',
-
-  // Check authentication
   handle () {
-    // Mark session as not active
-    this.status = false
-
     // Check authentication
     let cognitoUser = this.getUserPool().getCurrentUser()
-    if (typeof cognitoUser === 'object') {
+    if (cognitoUser !== null) {
       cognitoUser.getSession(err => {
         if (!err) {
           // Set status as authenticated
-          this.status = true
+          this.actions.setStatus(true)
           // Get user info
           cognitoUser.getUserAttributes((err, userData) => {
             if (!err) {
@@ -94,6 +85,7 @@ export default {
       Username: this.getUsername(),
       Pool: this.getUserPool()
     })
+
     cognitoUser.signOut()
     this.actions.invalidateSession()
   },
@@ -105,19 +97,19 @@ export default {
     cognitoUser.confirmRegistration(data.code, true, callback)
   },
   getUsername () {
-    return this.storeData.username
+    return this.storeData.username()
   },
   getName () {
-    return this.storeData.name
+    return this.storeData.name()
   },
   isAuthenticated () {
-    return this.status
+    return this.storeData.status()
   },
   getUserPool () {
     if (typeof this.pool !== 'object') {
       this.pool = new CognitoUserPool({
-        UserPoolId: COGNITO_USER_POOL_ID,
-        ClientId: COGNITO_APP_CLIENT_ID
+        UserPoolId: awsConfig.poolId,
+        ClientId: awsConfig.clientId
       })
     }
 
@@ -141,14 +133,16 @@ export default {
     ]
   },
   actions: {
+    setStatus: (status) => store.dispatch('auth/setStatus', status),
     setEmail: (email) => store.dispatch('auth/setEmail', email),
     setUsername: (username) => store.dispatch('auth/setUsername', username),
     setName: (name) => store.dispatch('auth/setName', name),
     invalidateSession: () => store.dispatch('auth/invalidateSession')
   },
   storeData: {
-    email: store.getters['auth/email'],
-    username: store.getters['auth/username'],
-    name: store.getters['auth/name']
+    status: () => store.getters['auth/status'],
+    email: () => store.getters['auth/email'],
+    username: () => store.getters['auth/username'],
+    name: () => store.getters['auth/name']
   }
 }
