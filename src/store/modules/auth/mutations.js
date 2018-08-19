@@ -1,23 +1,23 @@
 import {
   SET_USERNAME,
   SET_NAME,
-  SET_TOKEN,
+  SET_EMAIL,
   INVALIDATE_DATA
 } from './types'
 
 export default {
-  [SET_USERNAME] (state, user) {
-    state.user = user
+  [SET_USERNAME] (state, username) {
+    state.username = username
   },
-  [SET_NAME] (state, user) {
-    state.user = user
+  [SET_NAME] (state, name) {
+    state.name = name
   },
-  [SET_TOKEN] (state, token) {
-    state.token = token
+  [SET_EMAIL] (state, email) {
+    state.email = email
   },
   [INVALIDATE_DATA] (state) {
     state.username = null
     state.name = null
-    state.token = null
+    state.email = null
   }
 }

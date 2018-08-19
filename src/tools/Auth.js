@@ -17,22 +17,40 @@ export default {
 
   // Check authentication
   handle () {
-    let token = localStorage.getItem('token')
-    if (token) {
-      this.__actions.setToken(token)
-      this.__actions.setName(localStorage.getItem('name'))
-      this.__actions.setUsername(localStorage.getItem('username'))
-    } else {
-      // Invalidate user data
-      this.__actions.invalidateSession()
+    // Mark session as not active
+    this.status = false
+
+    // Check authentication
+    let cognitoUser = this.getUserPool().getCurrentUser()
+    if (typeof cognitoUser === 'object') {
+      cognitoUser.getSession(err => {
+        if (!err) {
+          // Set status as authenticated
+          this.status = true
+          // Get user info
+          cognitoUser.getUserAttributes((err, userData) => {
+            if (!err) {
+              for (let data of userData) {
+                if (data.getName() === 'sub') {
+                  this.actions.setUsername(data.getValue())
+                } else if (data.getName() === 'name') {
+                  this.actions.setName(data.getValue())
+                } else if (data.getName() === 'email') {
+                  this.actions.setEmail(data.getValue())
+                }
+              }
+            }
+          })
+        }
+      })
     }
   },
   register (data, callback) {
-    this.__userPool()
+    this.getUserPool()
       .signUp(
         data.email,
         data.password,
-        this.__registerAttributes(data),
+        this.handleRegisterAttributes(data),
         null,
         callback
       )
@@ -44,16 +62,16 @@ export default {
     })
     let cognitoUser = new CognitoUser({
       Username: data.email,
-      Pool: this.__userPool()
+      Pool: this.getUserPool()
     })
 
     cognitoUser.authenticateUser(authData, {
       onSuccess (result) {
         /* Use the idToken for Logins Map when Federating User Pools with identity pools or when passing
-                through an Authorization Header to an API Gateway Authorizer */
-        this.__actions.setToken(result.getAccessToken().getJwtToken())
-        this.__actions.setUsername(cognitoUser.getUsername())
-        this.__actions.setName(cognitoUser.getUsername())
+        through an Authorization Header to an API Gateway Authorizer */
+        this.actions.setToken(result.getAccessToken().getJwtToken())
+        this.actions.setUsername(cognitoUser.getUsername())
+        this.actions.setName(cognitoUser.getUsername())
 
         cognitoUser.getUserAttributes((error, result) => {
           if (error) {
@@ -61,7 +79,7 @@ export default {
           }
           for (let key in result) {
             if (result[key].getName() === this.NAME_FIELD) {
-              this.__actions.setName(result[key].getValue())
+              this.actions.setName(result[key].getValue())
             }
           }
         })
@@ -74,37 +92,38 @@ export default {
   logout () {
     let cognitoUser = new CognitoUser({
       Username: this.getUsername(),
-      Pool: this.__userPool()
+      Pool: this.getUserPool()
     })
     cognitoUser.signOut()
-    this.__actions.invalidateSession()
+    this.actions.invalidateSession()
   },
   confirm (data, callback) {
     let cognitoUser = new CognitoUser({
       Username: data.email,
-      Pool: this.__userPool()
+      Pool: this.getUserPool()
     })
     cognitoUser.confirmRegistration(data.code, true, callback)
   },
   getUsername () {
-    return this.__storeData.username
+    return this.storeData.username
   },
   getName () {
-    return this.__storeData.name
-  },
-  getToken () {
-    return this.__storeData.token
+    return this.storeData.name
   },
   isAuthenticated () {
-    return !!this.getToken()
+    return this.status
   },
-  __userPool () {
-    return new CognitoUserPool({
-      UserPoolId: COGNITO_USER_POOL_ID,
-      ClientId: COGNITO_APP_CLIENT_ID
-    })
+  getUserPool () {
+    if (typeof this.pool !== 'object') {
+      this.pool = new CognitoUserPool({
+        UserPoolId: COGNITO_USER_POOL_ID,
+        ClientId: COGNITO_APP_CLIENT_ID
+      })
+    }
+
+    return this.pool
   },
-  __registerAttributes ({name, phone, email}) {
+  handleRegisterAttributes ({name, phone, email}) {
     return [
       new CognitoUserAttribute({
         Name: 'email',
@@ -121,14 +140,14 @@ export default {
       })
     ]
   },
-  __actions: {
-    setToken: (token) => store.dispatch('auth/setToken', token),
+  actions: {
+    setEmail: (email) => store.dispatch('auth/setEmail', email),
     setUsername: (username) => store.dispatch('auth/setUsername', username),
-    setName: (user) => store.dispatch('auth/setName', user),
+    setName: (name) => store.dispatch('auth/setName', name),
     invalidateSession: () => store.dispatch('auth/invalidateSession')
   },
-  __storeData: {
-    token: store.getters['auth/token'],
+  storeData: {
+    email: store.getters['auth/email'],
     username: store.getters['auth/username'],
     name: store.getters['auth/name']
   }
