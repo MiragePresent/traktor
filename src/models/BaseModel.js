@@ -1,25 +1,12 @@
 import {only} from '../tools/helpers'
 import * as validators from 'vuelidate/lib/validators'
+import VueApollo from 'vue-apollo'
 
 export default class BaseModel {
-  constructor () {
-    // Set default properties
-    this._init()
-  }
-
+  // Settings
   fields () {
     return {
       valid: false
-    }
-  }
-
-  getData () {
-    return only(this, Object.keys(this.fields()))
-  }
-
-  clear () {
-    for (let fieldName in this.fields()) {
-      this._clearField(fieldName)
     }
   }
 
@@ -27,18 +14,46 @@ export default class BaseModel {
     return {}
   }
 
-  validations () {
-    const rules = this.rules()
-    const validations = {}
-
-    for (let field in rules) {
-      validations[field] = {}
-      for (let rule in rules[field]) {
-        validations[field][rules[field][rule]] = validators[rules[field][rule]]
-      }
+  constructor (data = null) {
+    // Set default properties
+    this.init()
+    // Load data to model
+    if (data !== null) {
+      this.load(data, true)
     }
+  }
 
-    return {model: validations}
+  find (id) {
+    if (this.query()) {
+      VueApollo.query({
+        query: this.query(),
+        variables: { id }
+      })
+    }
+  }
+
+  load (data, isDefault = false) {
+    let filteredData = Object.assign(this.getData(), this.filterData(data))
+    Object.assign(this, filteredData)
+
+    // Save as default state
+    if (isDefault) {
+      this.saveDefaultState(filteredData)
+    }
+  }
+
+  getData () {
+    return only(this, Object.keys(this.fields()))
+  }
+
+  // Tools
+  query () {
+    return null
+  }
+  clear () {
+    for (let fieldName in this.fields()) {
+      this.clearField(fieldName)
+    }
   }
 
   getErrors ($v, field) {
@@ -57,17 +72,36 @@ export default class BaseModel {
     return errors
   }
 
-  _init () {
+  validations () {
+    const rules = this.rules()
+    const validations = {}
+
+    for (let field in rules) {
+      validations[field] = {}
+      for (let rule in rules[field]) {
+        validations[field][rules[field][rule]] = validators[rules[field][rule]]
+      }
+    }
+
+    return {model: validations}
+  }
+
+  // Protected methods
+  init () {
     // Init attributes with default values
     Object.assign(this, this.fields())
-    this._saveDefaultState(this.fields())
+    this.saveDefaultState(this.fields())
   }
 
-  _saveDefaultState (state) {
-    this._defaultState = state
+  saveDefaultState (state) {
+    this.defaultState = state
   }
 
-  _clearField (fieldName) {
-    this[fieldName] = this._defaultState[fieldName]
+  filterData (data) {
+    return only(data, Object.keys(this.fields()))
+  }
+
+  clearField (fieldName) {
+    this[fieldName] = this.defaultState[fieldName]
   }
 }

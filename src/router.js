@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
-import About from './views/About.vue'
+import Blog from './views/BlogView.vue'
 import AuthView from './views/AuthView.vue'
 
 Vue.use(Router)
@@ -12,6 +12,14 @@ const router = new Router({
       path: '/',
       name: 'home',
       component: Home
+    }, {
+      path: '/blog',
+      name: 'blog',
+      component: Blog
+    }, {
+      path: '/blog/create',
+      name: 'add_post',
+      component: Blog
     }, {
       path: '/login',
       name: 'login',
@@ -33,10 +41,6 @@ const router = new Router({
       meta: {
         middleware: ['guest']
       }
-    }, {
-      path: '/about',
-      name: 'about',
-      component: About
     }
   ]
 })
